@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot to PDF Converter - ToolKit Pro</title>
+    <meta name="description" content="Convert screenshots to PDF documents for documentation. Free online screenshot to PDF converter tool.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #4cc9f0;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #38b000;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow);
+            padding: 15px 0;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .tool-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tool-description {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 3px dashed rgba(67, 97, 238, 0.3);
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: rgba(67, 97, 238, 0.02);
+            transition: var(--transition);
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .upload-subtext {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Screenshot List */
+        .screenshot-list {
+            display: none;
+            margin-bottom: 30px;
+        }
+
+        .screenshot-list-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .screenshot-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            cursor: move;
+        }
+
+        .screenshot-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .screenshot-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .screenshot-item .order-number {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Settings */
+        .settings {
+            background: rgba(67, 97, 238, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .settings-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .setting-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .setting-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .setting-input {
+            padding: 10px 15px;
+            border: 2px solid rgba(67, 97, 238, 0.2);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        /* Preview */
+        .preview-section {
+            display: none;
+            margin-bottom: 30px;
+        }
+
+        .preview-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .preview-container {
+            text-align: center;
+        }
+
+        .preview-info {
+            background: rgba(67, 97, 238, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .preview-info h4 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .preview-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Convert Button */
+        .convert-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 0 auto;
+            display: block;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Download Section */
+        .download-section {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 40px;
+            background: var(--success);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .download-btn:hover {
+            background: #2d8a00;
+            transform: translateY(-2px);
+        }
+
+        /* Ad Section */
+        .ad-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 40px 0;
+            border: 2px dashed rgba(67, 97, 238, 0.2);
+        }
+
+        .ad-placeholder {
+            color: var(--gray);
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tool-container {
+                padding: 20px;
+            }
+
+            .tool-title {
+                font-size: 2rem;
+            }
+
+            .screenshot-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .setting-group {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="logo-text">ToolKit Pro</div>
+                </a>
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Tools
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1 class="tool-title">Screenshot to PDF Converter</h1>
+                <p class="tool-description">Convert multiple screenshots to a single PDF document. Perfect for creating documentation and reports.</p>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">Drop your screenshots here or click to browse</div>
+                <div class="upload-subtext">Select multiple screenshots to create a PDF document</div>
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i>
+                    Choose Screenshots
+                </button>
+                <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
+            </div>
+
+            <!-- Screenshot List -->
+            <div class="screenshot-list" id="screenshotList">
+                <h3 class="screenshot-list-title">Selected Screenshots</h3>
+                <div class="screenshot-grid" id="screenshotGrid"></div>
+                <p style="text-align: center; color: var(--gray); font-size: 0.9rem;">
+                    Drag and drop screenshots to reorder them. The order determines the PDF page sequence.
+                </p>
+            </div>
+
+            <!-- Settings -->
+            <div class="settings" id="settings">
+                <h3 class="settings-title">PDF Settings</h3>
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <label class="setting-label">Page Size</label>
+                        <select class="setting-input" id="pageSize">
+                            <option value="a4">A4</option>
+                            <option value="letter">Letter</option>
+                            <option value="legal">Legal</option>
+                            <option value="a3">A3</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">Orientation</label>
+                        <select class="setting-input" id="orientation">
+                            <option value="portrait">Portrait</option>
+                            <option value="landscape">Landscape</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">Margins (mm)</label>
+                        <input type="number" class="setting-input" id="margins" value="10" min="0" max="50">
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">Image Quality</label>
+                        <select class="setting-input" id="imageQuality">
+                            <option value="1">High Quality</option>
+                            <option value="0.8">Good Quality</option>
+                            <option value="0.6">Medium Quality</option>
+                            <option value="0.4">Low Quality</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section" id="previewSection">
+                <h3 class="preview-title">PDF Preview</h3>
+                <div class="preview-container">
+                    <div class="preview-info">
+                        <h4>PDF Information</h4>
+                        <p id="pdfInfo">PDF will be generated with the selected settings.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Convert Button -->
+            <button class="convert-btn" id="convertBtn" disabled>
+                <i class="fas fa-cog fa-spin" id="convertIcon"></i>
+                <span id="convertText">Convert to PDF</span>
+            </button>
+
+            <!-- Download Section -->
+            <div class="download-section" id="downloadSection">
+                <a href="#" class="download-btn" id="downloadBtn" download="screenshots.pdf">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- Ad Section -->
+        <div class="ad-container">
+            <div class="ad-label">Advertisement</div>
+            <div class="ad-slot">
+                <!-- Google AdSense Ad Unit -->
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-app-pub-9926601045100294/7706359302"
+                     data-ad-slot="1234567890"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="img-compress.html">Image Compressor</a>
+                    <a href="image-to-png.html">Image to PNG</a>
+                    <a href="image-resizer.html">Image Resizer</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2023 ToolKit Pro. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let selectedScreenshots = [];
+        let pdfBlob = null;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const screenshotList = document.getElementById('screenshotList');
+        const screenshotGrid = document.getElementById('screenshotGrid');
+        const settings = document.getElementById('settings');
+        const previewSection = document.getElementById('previewSection');
+        const pdfInfo = document.getElementById('pdfInfo');
+        const convertBtn = document.getElementById('convertBtn');
+        const convertIcon = document.getElementById('convertIcon');
+        const convertText = document.getElementById('convertText');
+        const downloadSection = document.getElementById('downloadSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Event Listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        convertBtn.addEventListener('click', convertToPDF);
+
+        // Drag and Drop Handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            const imageFiles = files.filter(file => file.type.startsWith('image/'));
+            
+            if (imageFiles.length === 0) {
+                alert('Please select valid image files.');
+                return;
+            }
+
+            // Add new screenshots to the list
+            imageFiles.forEach(file => {
+                selectedScreenshots.push({
+                    file: file,
+                    id: Date.now() + Math.random()
+                });
+            });
+
+            updateScreenshotList();
+            updateUI();
+        }
+
+        function updateScreenshotList() {
+            screenshotGrid.innerHTML = '';
+            
+            selectedScreenshots.forEach((screenshot, index) => {
+                const screenshotItem = document.createElement('div');
+                screenshotItem.className = 'screenshot-item';
+                screenshotItem.draggable = true;
+                screenshotItem.dataset.id = screenshot.id;
+                
+                screenshotItem.innerHTML = `
+                    <img src="${URL.createObjectURL(screenshot.file)}" alt="Screenshot ${index + 1}">
+                    <button class="remove-btn" onclick="removeScreenshot('${screenshot.id}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="order-number">${index + 1}</div>
+                `;
+                
+                // Drag and drop functionality
+                screenshotItem.addEventListener('dragstart', handleDragStart);
+                screenshotItem.addEventListener('dragover', handleDragOver);
+                screenshotItem.addEventListener('drop', handleDrop);
+                
+                screenshotGrid.appendChild(screenshotItem);
+            });
+        }
+
+        function removeScreenshot(id) {
+            selectedScreenshots = selectedScreenshots.filter(img => img.id !== id);
+            updateScreenshotList();
+            updateUI();
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+        }
+
+        function updateUI() {
+            if (selectedScreenshots.length > 0) {
+                screenshotList.style.display = 'block';
+                settings.style.display = 'block';
+                previewSection.style.display = 'block';
+                convertBtn.disabled = false;
+                uploadArea.style.display = 'none';
+                
+                // Update PDF info
+                const pageSize = document.getElementById('pageSize').value.toUpperCase();
+                const orientation = document.getElementById('orientation').value;
+                pdfInfo.textContent = `${selectedScreenshots.length} screenshots will be converted to ${pageSize} ${orientation} PDF.`;
+            } else {
+                screenshotList.style.display = 'none';
+                settings.style.display = 'none';
+                previewSection.style.display = 'none';
+                convertBtn.disabled = true;
+                uploadArea.style.display = 'block';
+                downloadSection.style.display = 'none';
+            }
+        }
+
+        function convertToPDF() {
+            if (selectedScreenshots.length === 0) {
+                alert('Please select at least one screenshot.');
+                return;
+            }
+
+            // Show loading state
+            convertBtn.disabled = true;
+            convertIcon.className = 'fas fa-cog fa-spin';
+            convertText.textContent = 'Converting to PDF...';
+
+            // Get settings
+            const pageSize = document.getElementById('pageSize').value;
+            const orientation = document.getElementById('orientation').value;
+            const margins = parseInt(document.getElementById('margins').value);
+            const imageQuality = parseFloat(document.getElementById('imageQuality').value);
+
+            // Create PDF
+            createPDF(pageSize, orientation, margins, imageQuality);
+        }
+
+        function createPDF(pageSize, orientation, margins, imageQuality) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: orientation,
+                unit: 'mm',
+                format: pageSize
+            });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const imageWidth = pageWidth - (margins * 2);
+            const imageHeight = pageHeight - (margins * 2);
+
+            let currentPage = 0;
+
+            function addImageToPDF(index) {
+                if (index >= selectedScreenshots.length) {
+                    // All images processed, save PDF
+                    const pdfBlob = doc.output('blob');
+                    const url = URL.createObjectURL(pdfBlob);
+                    
+                    downloadSection.style.display = 'block';
+                    downloadBtn.href = url;
+                    
+                    // Reset button
+                    convertBtn.disabled = false;
+                    convertIcon.className = 'fas fa-check';
+                    convertText.textContent = 'PDF Created Successfully!';
+                    
+                    setTimeout(() => {
+                        convertIcon.className = 'fas fa-cog';
+                        convertText.textContent = 'Convert to PDF';
+                    }, 2000);
+                    
+                    return;
+                }
+
+                const screenshot = selectedScreenshots[index];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Calculate image dimensions to fit page
+                        const imgAspectRatio = img.width / img.height;
+                        const pageAspectRatio = imageWidth / imageHeight;
+                        
+                        let finalWidth, finalHeight;
+                        if (imgAspectRatio > pageAspectRatio) {
+                            finalWidth = imageWidth;
+                            finalHeight = imageWidth / imgAspectRatio;
+                        } else {
+                            finalHeight = imageHeight;
+                            finalWidth = imageHeight * imgAspectRatio;
+                        }
+
+                        // Center image on page
+                        const x = margins + (imageWidth - finalWidth) / 2;
+                        const y = margins + (imageHeight - finalHeight) / 2;
+
+                        doc.addImage(img, 'JPEG', x, y, finalWidth, finalHeight, '', 'FAST', 0);
+                        
+                        // Add next image to new page if not the last one
+                        if (index < selectedScreenshots.length - 1) {
+                            doc.addPage();
+                        }
+                        
+                        // Process next image
+                        addImageToPDF(index + 1);
+                    };
+                    img.src = e.target.result;
+                };
+                
+                reader.readAsDataURL(screenshot.file);
+            }
+
+            // Start processing images
+            addImageToPDF(0);
+        }
+    </script>
+</body>
+</html> 
